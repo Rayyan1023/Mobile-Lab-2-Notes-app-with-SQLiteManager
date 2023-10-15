@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Note {
+    // Key for passing the note ID as an extra in an Intent
     public static String NOTE_EDIT_EXTRA = "noteEdit";
+
     private int id;
     public static ArrayList<Note> noteArrayList = new ArrayList<>();
     private String title;
@@ -19,6 +21,7 @@ public class Note {
         this.deleted = deleted;
     }
 
+    // Constructor for non-deleted notes (without the deleted date)
     public Note(int id, String title, String description) {
         this.id = id;
         this.title = title;
@@ -26,23 +29,28 @@ public class Note {
         deleted = null;
     }
 
+    // Get a note by its ID
     public static Note getNoteForID(int passedNoteID) {
-        for(Note note: noteArrayList){
-            if(note.getId() == passedNoteID)
+        for (Note note : noteArrayList) {
+            if (note.getId() == passedNoteID) {
                 return note;
+            }
         }
-        return null;
+        return null; // If the note with the given ID is not found
     }
 
-    public static ArrayList<Note> nonDeletedNotes (){
+    // Get a list of non-deleted notes
+    public static ArrayList<Note> nonDeletedNotes() {
         ArrayList<Note> nonDeleted = new ArrayList<>();
-        for(Note note: noteArrayList){
-            if(note.getDeleted() == null)
+        for (Note note : noteArrayList) {
+            if (note.getDeleted() == null) {
                 nonDeleted.add(note);
+            }
         }
         return nonDeleted;
     }
 
+    // Getter and setter for the note's color
     public String getColor() {
         return color;
     }
@@ -51,6 +59,7 @@ public class Note {
         this.color = color;
     }
 
+    // Getters and setters for other fields
     public int getId() {
         return id;
     }
@@ -82,8 +91,4 @@ public class Note {
     public void setDeleted(Date deleted) {
         this.deleted = deleted;
     }
-
-
-
 }
-

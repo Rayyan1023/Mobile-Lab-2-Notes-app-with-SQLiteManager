@@ -112,20 +112,22 @@
 
     <RadioGroup
         android:id="@+id/colorRadioGroup"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="244dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="384dp"
+        android:layout_marginEnd="16dp"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
 
         <RadioButton
             android:id="@+id/yellow"
-            android:layout_width="105dp"
-            android:layout_height="99dp"
+            android:layout_width="89dp"
+            android:layout_height="83dp"
             android:layout_margin="16dp"
             android:background="#e5eb34"
             android:button="@null"
@@ -134,8 +136,8 @@
 
         <RadioButton
             android:id="@+id/blue"
-            android:layout_width="105dp"
-            android:layout_height="99dp"
+            android:layout_width="95dp"
+            android:layout_height="83dp"
             android:layout_margin="16dp"
             android:background="#3489eb"
             android:button="@null"
@@ -144,8 +146,8 @@
 
         <RadioButton
             android:id="@+id/green"
-            android:layout_width="105dp"
-            android:layout_height="99dp"
+            android:layout_width="92dp"
+            android:layout_height="83dp"
             android:layout_margin="16dp"
             android:background="#34eb3d"
             android:button="@null"

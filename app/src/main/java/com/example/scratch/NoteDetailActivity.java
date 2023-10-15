@@ -1,35 +1,40 @@
 package com.example.scratch;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.TextView;
+
+import com.example.scratch.MainActivity;
+import com.example.scratch.Note;
+import com.example.scratch.R;
+import com.example.scratch.SQLiteManager;
 
 import java.util.Date;
 
 public class NoteDetailActivity extends AppCompatActivity {
-
     private EditText titleEditText, descEditText;
-    private Button saveNote;
-    private Button deleteButton;
+    private Button saveNote, deleteButton;
     private RadioGroup colorRadioGroup;
     private Note selectedNote;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note_detail);
 
+        // Initialize UI elements
         saveNote = findViewById(R.id.saveNote);
         colorRadioGroup = findViewById(R.id.colorRadioGroup);
         initWidgets();
 
+        // Check if it's an edit or a new note
         checkForEditNote();
 
+        // Add a click listener for the "Save" button
         saveNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -37,11 +42,11 @@ public class NoteDetailActivity extends AppCompatActivity {
             }
         });
 
-        // Add an OnClickListener for the radio group
+        // Add a change listener for the color selection RadioGroup
         colorRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-                // Handle the color selection here
+                // Handle the color selection
                 handleColorSelection(checkedId);
             }
         });
@@ -58,11 +63,8 @@ public class NoteDetailActivity extends AppCompatActivity {
             color = "#34eb3d"; // Green color
         }
 
-        if (color != null) {
-            // Do something with the selected color if needed
-        }
+        // You can perform actions based on the selected color if needed
     }
-
 
     private void initWidgets() {
         titleEditText = findViewById(R.id.titleEditText);
@@ -75,43 +77,66 @@ public class NoteDetailActivity extends AppCompatActivity {
         int passedNoteID = previousIntent.getIntExtra(Note.NOTE_EDIT_EXTRA, -1);
         selectedNote = Note.getNoteForID(passedNoteID);
 
-        if(selectedNote != null) {
+        if (selectedNote != null) {
             titleEditText.setText(selectedNote.getTitle());
             descEditText.setText(selectedNote.getDescription());
-        }
-        else{
+        } else {
             deleteButton.setVisibility(View.INVISIBLE);
         }
     }
 
+    private boolean isSaveNoteRunning = false; // Flag to track if the function is running
+
     public void saveNote() {
+        if (isSaveNoteRunning) {
+            return; // If the function is already running, exit
+        }
+
+        isSaveNoteRunning = true; // Set the flag to indicate the function is running
+        saveNote.setEnabled(false); // Disable the "Save" button
+
         SQLiteManager sqLiteManager = SQLiteManager.instanceOfDatabase(this);
         String title = titleEditText.getText().toString().trim();
         String desc = descEditText.getText().toString();
 
         if (title.isEmpty()) {
             titleEditText.setError("Title cannot be empty");
+            isSaveNoteRunning = false; // Reset the flag
+            saveNote.setEnabled(true); // Re-enable the "Save" button
             return;
         }
 
-        if (selectedNote == null) {
-            // Creating a new note
-            int id = Note.noteArrayList.size();
-            Note newNote = new Note(id, title, desc);
+        boolean isNewNote = selectedNote == null;
 
-            RadioGroup colorRadioGroup = findViewById(R.id.colorRadioGroup);
-            int selectedColorId = colorRadioGroup.getCheckedRadioButtonId();
-
-            if (selectedColorId == R.id.yellow) {
-                newNote.setColor("#e5eb34"); // Yellow color
-            } else if (selectedColorId == R.id.blue) {
-                newNote.setColor("#3489eb"); // Blue color
-            } else if (selectedColorId == R.id.green) {
-                newNote.setColor("#34eb3d"); // Green color
+        if (isNewNote) {
+            // Check if a note with the same title and description already exists
+            boolean isDuplicate = false;
+            for (Note note : Note.noteArrayList) {
+                if (note.getTitle().equals(title) && note.getDescription().equals(desc)) {
+                    isDuplicate = true;
+                    break;
+                }
             }
 
-            Note.noteArrayList.add(newNote);
-            sqLiteManager.addNoteToDatabase(newNote);
+            if (!isDuplicate) {
+                // Creating a new note
+                int id = Note.noteArrayList.size();
+                Note newNote = new Note(id, title, desc);
+
+                // Retrieve the selected color
+                int selectedColorId = colorRadioGroup.getCheckedRadioButtonId();
+
+                if (selectedColorId == R.id.yellow) {
+                    newNote.setColor("#e5eb34"); // Yellow color
+                } else if (selectedColorId == R.id.blue) {
+                    newNote.setColor("#3489eb"); // Blue color
+                } else if (selectedColorId == R.id.green) {
+                    newNote.setColor("#34eb3d"); // Green color
+                }
+
+                Note.noteArrayList.add(newNote);
+                sqLiteManager.addNoteToDatabase(newNote);
+            }
         } else {
             // Editing an existing note
             selectedNote.setTitle(title);
@@ -119,9 +144,13 @@ public class NoteDetailActivity extends AppCompatActivity {
             sqLiteManager.updateNoteInDB(selectedNote);
         }
 
+        isSaveNoteRunning = false; // Reset the flag
+        saveNote.setEnabled(true); // Re-enable the "Save" button
+
         Intent newNoteIntent = new Intent(this, MainActivity.class);
         startActivity(newNoteIntent);
     }
+
 
 
 
